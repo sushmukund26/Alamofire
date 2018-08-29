@@ -381,6 +381,40 @@ class DownloadResponseTestCase: BaseTestCase {
     }
 }
 
+func testThatDownloadOptionsThrowsErrorIfPreviousFileExistsAndRemovePreviousFileOptionIsNotProvided() {
+    // Given
+    let fileName = "test_output.json"
+    let directoryURL = testDirectoryURL.appendingPathComponent("some/random/folder")
+    let directoryCreated = FileManager.createDirectory(at: directoryURL)
+    let fileCreated = FileManager.createFile(atPath: "\(directoryURL.path)/\(fileName)")
+
+    let fileURL = directoryURL.appendingPathComponent(fileName)
+
+    let expectation = self.expectation(description: "Download should complete and move file to URL: \(fileURL)")
+    var response: DefaultDownloadResponse?
+
+    // When
+    Alamofire.download("https://httpbin.org/get", to: { _, _ in (fileURL, [])})
+        .response { resp in
+            response = resp
+            expectation.fulfill()
+    }
+
+    waitForExpectations(timeout: timeout, handler: nil)
+
+    // Then
+    XCTAssertTrue(directoryCreated)
+    XCTAssertTrue(fileCreated)
+
+    XCTAssertNotNil(response?.request)
+    XCTAssertNotNil(response?.response)
+    XCTAssertNotNil(response?.temporaryURL)
+    XCTAssertNotNil(response?.destinationURL)
+    XCTAssertNil(response?.resumeData)
+
+    XCTAssertNotNil(response?.error)
+}
+
 // MARK: -
 
 class DownloadResumeDataTestCase: BaseTestCase {
