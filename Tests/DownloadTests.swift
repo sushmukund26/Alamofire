@@ -349,10 +349,12 @@ class DownloadResponseTestCase: BaseTestCase {
 
     func testThatDownloadOptionsCanRemovePreviousFilePriorToMovingFile() {
         // Given
+        let fileName = "test_output.json"
         let directoryURL = testDirectoryURL.appendingPathComponent("some/random/folder")
         let directoryCreated = FileManager.createDirectory(at: directoryURL)
+        let fileCreated = FileManager.createFile(atPath: "\(directoryURL.path)/\(fileName)")
 
-        let fileURL = directoryURL.appendingPathComponent("test_output.json")
+        let fileURL = directoryURL.appendingPathComponent(fileName)
 
         let expectation = self.expectation(description: "Download should complete and move file to URL: \(fileURL)")
         var response: DefaultDownloadResponse?
@@ -368,6 +370,7 @@ class DownloadResponseTestCase: BaseTestCase {
 
         // Then
         XCTAssertTrue(directoryCreated)
+        XCTAssertTrue(fileCreated)
 
         XCTAssertNotNil(response?.request)
         XCTAssertNotNil(response?.response)

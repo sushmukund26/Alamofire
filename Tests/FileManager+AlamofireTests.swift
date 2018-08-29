@@ -53,6 +53,10 @@ extension FileManager {
         return createDirectory(atPath: url.path)
     }
 
+    static func createFile(atPath path: String) -> Bool {
+        return FileManager.default.createFile(atPath: path, contents: Data(), attributes: nil)
+    }
+
     @discardableResult
     static func removeItem(atPath path: String) -> Bool {
         do {
